@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head><meta name="allchatbots-layout" content="large">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAT Math Practice Test</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1d2433;background:#e9ecf1;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;background:#1f3a68;color:#fff}
+.bar h1{margin:0;font-size:18px}
+.steps{display:flex;gap:8px;flex-wrap:wrap}
+.step{padding:8px 14px;border-radius:6px;border:1px solid #fff;background:transparent;color:#fff;font-weight:600}
+.step.active{background:#fff;color:#1f3a68}
+.step:disabled{opacity:.45;cursor:default}
+.next{padding:8px 14px;border-radius:6px;border:none;background:#d9731a;color:#fff;font-weight:700}
+.next.hidden{display:none}
+.msg{padding:8px 16px;font-size:14px;background:#fff6e0;border-bottom:1px solid #e8c36a;display:none}
+.msg.show{display:block}
+iframe{flex:1;width:100%;border:0;background:#fff}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>SAT Math Practice Test: Module 1 and Module 2</h1>
+  <div class="steps">
+    <button class="step active" id="b1" onclick="go(1)">Module 1</button>
+    <button class="step" id="b2" onclick="go(2)" disabled>Module 2</button>
+    <button class="next hidden" id="nextBtn" onclick="go(2)">Continue to Module 2</button>
+  </div>
+</div>
+<div class="msg" id="msg">When you finish Module 1 (after Submit or when the timer ends), click <b>Continue to Module 2</b>. Module 2 is locked until you do.</div>
+<iframe id="frame" src="module-1.html" title="SAT practice module"></iframe>
+<script>
+var current = 1;
+function go(n){
+  if(n === 2 && current === 1){ /* allowed by the continue button */ }
+  current = n;
+  document.getElementById('frame').src = n === 1 ? 'module-1.html' : 'module-2.html';
+  document.getElementById('b1').classList.toggle('active', n === 1);
+  document.getElementById('b2').classList.toggle('active', n === 2);
+  document.getElementById('b2').disabled = false;
+  document.getElementById('nextBtn').classList.toggle('hidden', n === 2);
+  document.getElementById('msg').classList.toggle('show', n === 1);
+}
+document.getElementById('b2').disabled = true;
+document.getElementById('nextBtn').classList.remove('hidden');
+</script>
+</body>
+</html>

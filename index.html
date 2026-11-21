@@ -1,51 +1,451 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head><meta name="allchatbots-layout" content="large">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SAT Math Practice Test</title>
+<script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1d2433;background:#e9ecf1;display:flex;flex-direction:column}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 16px;background:#1f3a68;color:#fff}
-.bar h1{margin:0;font-size:18px}
-.steps{display:flex;gap:8px;flex-wrap:wrap}
-.step{padding:8px 14px;border-radius:6px;border:1px solid #fff;background:transparent;color:#fff;font-weight:600}
-.step.active{background:#fff;color:#1f3a68}
-.step:disabled{opacity:.45;cursor:default}
-.next{padding:8px 14px;border-radius:6px;border:none;background:#d9731a;color:#fff;font-weight:700}
-.next.hidden{display:none}
-.msg{padding:8px 16px;font-size:14px;background:#fff6e0;border-bottom:1px solid #e8c36a;display:none}
-.msg.show{display:block}
-iframe{flex:1;width:100%;border:0;background:#fff}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1d2433;background:#e9ecf1;font-size:15px}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none !important}
+.screen{position:fixed;inset:0;overflow:auto;background:#e9ecf1;z-index:10}
+.wrap{max-width:760px;margin:0 auto;padding:36px 18px 60px}
+.card{background:#fff;border:1px solid #c9ced8;border-radius:8px;padding:26px;margin-bottom:18px}
+h1{margin:0 0 6px;color:#1f3a68;font-size:26px}
+h2{margin:0 0 10px;color:#1f3a68;font-size:18px}
+ul.rules{padding-left:20px;line-height:1.7}
+.field label{display:block;font-weight:600;margin:18px 0 6px}
+.text-in{width:100%;padding:11px 12px;font-size:16px;border:1px solid #9aa3b5;border-radius:6px}
+.err{color:#c62828;font-size:14px;min-height:20px;margin-top:6px}
+.btn{padding:10px 18px;font-size:15px;font-weight:600;border:1px solid #1f3a68;border-radius:6px;background:#fff;color:#1f3a68}
+.btn.primary{background:#1f3a68;color:#fff}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.muted{color:#5b6475}
+.score-big{font-size:44px;font-weight:700;color:#1f3a68;margin:6px 0 4px}
+table.dt{border-collapse:collapse;margin:10px 0}
+table.dt th,table.dt td{border:1px solid #9aa3b5;padding:6px 14px;text-align:center;font-size:16px}
+table.dt th{background:#f0f3f8}
+.item{border-top:1px solid #c9ced8;padding:14px 0}
+.item .q{white-space:pre-line;margin:6px 0;font-weight:600}
+.item .meta{font-size:14px;color:#3b4252;margin-top:3px}
+.item .ex{font-size:14px;color:#3b4252;margin-top:8px;line-height:1.5}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:8px}
+.tag.bad{background:#fbe0e0;color:#9b1c1c}
+.tag.blank{background:#e6e9ef;color:#5b6475}
+.ref table{width:100%;border-collapse:collapse}
+.ref td{border-bottom:1px solid #e1e5ec;padding:8px 6px;font-size:15px}
+#test{position:fixed;inset:0;display:flex;flex-direction:column;background:#fff;z-index:5}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;min-height:54px;border-bottom:1px solid #c9ced8}
+.tb-side{display:flex;gap:8px;align-items:center}
+.modtitle{font-weight:700;color:#1f3a68}
+.timer{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;padding:4px 12px;border:1px solid #c9ced8;border-radius:6px;min-width:96px;text-align:center}
+.timer.warn{color:#c62828;border-color:#c62828}
+.tb-btn{background:#fff;border:1px solid #9aa3b5;padding:7px 12px;border-radius:6px;color:#1f3a68;font-weight:600}
+.tb-btn.dark{background:#1f3a68;color:#fff;border-color:#1f3a68}
+.body{flex:1;display:flex;min-height:0}
+.qpane{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.qhead{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-bottom:1px solid #c9ced8;background:#fafbfc}
+.qnum{font-weight:700}
+.mark{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #9aa3b5;border-radius:6px;padding:6px 10px;font-weight:600;color:#1d2433}
+.mark.on{border-color:#d9731a;background:#fff4e8;color:#8a4a0c}
+.qscroll{flex:1;overflow-y:auto;padding:22px 28px}
+.qcontent{max-width:760px}
+.prompt{white-space:pre-line;font-size:17px;line-height:1.65}
+.prompt table{border-collapse:collapse;margin:10px 0;white-space:normal}
+.prompt th,.prompt td{border:1px solid #9aa3b5;padding:6px 14px;text-align:center;font-size:16px;background:#fff}
+.prompt th{background:#f0f3f8}
+.fig{display:block;max-width:100%;height:auto;margin:8px 0 14px}
+.choices{display:grid;gap:10px;margin-top:20px}
+.choice{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:12px 14px;background:#fff;border:1px solid #9aa3b5;border-radius:8px;font-size:16px;color:#1d2433}
+.choice:hover{background:#f5f8fc}
+.choice.sel{border:2px solid #1f3a68;background:#eef3fb;padding:11px 13px}
+.letter{flex:0 0 30px;height:30px;border:1.5px solid #4a5263;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.choice.sel .letter{background:#1f3a68;border-color:#1f3a68;color:#fff}
+.numbox{margin-top:24px}
+.numbox label{display:block;font-weight:600;margin-bottom:8px}
+.numbox input{width:260px;max-width:100%;padding:11px 12px;font-size:18px;border:1.5px solid #4a5263;border-radius:6px}
+.hint{color:#5b6475;font-size:14px;margin-top:8px}
+.bottombar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid #c9ced8;background:#fafbfc;flex-wrap:wrap}
+.navgrid{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:720px}
+.nb{width:34px;height:34px;border:1px solid #9aa3b5;border-radius:6px;background:#fff;font-weight:700;color:#1d2433;position:relative}
+.nb.ans{background:#dfe7f5;border-color:#1f3a68}
+.nb.mk::after{content:"";position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:#d9731a;border-radius:50%}
+.nb.cur{outline:2px solid #1f3a68;outline-offset:1px}
+.calc{position:absolute;right:0;top:0;bottom:0;width:440px;max-width:100%;background:#fff;border-left:1px solid #c9ced8;display:flex;flex-direction:column;z-index:4}
+.calc-head{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid #c9ced8;font-weight:700;color:#1f3a68}
+#calcHost{flex:1;min-height:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.overlay .card{max-width:620px;max-height:90vh;overflow:auto;margin:0}
+@media (max-width:700px){.calc{width:100%}.qscroll{padding:16px}}
 </style>
 </head>
 <body>
-<div class="bar">
-  <h1>SAT Math Practice Test: Module 1 and Module 2</h1>
-  <div class="steps">
-    <button class="step active" id="b1" onclick="go(1)">Module 1</button>
-    <button class="step" id="b2" onclick="go(2)" disabled>Module 2</button>
-    <button class="next hidden" id="nextBtn" onclick="go(2)">Continue to Module 2</button>
+
+<!-- Intro: name entered once -->
+<div id="intro" class="screen">
+  <div class="wrap">
+    <div class="card">
+      <h1>SAT Math Practice Test</h1>
+      <p class="muted">Module 1 and Module 2, 22 questions each, 35 minutes per module.</p>
+      <h2>Before you begin</h2>
+      <ul class="rules">
+        <li>Enter your name once. It is used on your results.</li>
+        <li>Module 1 starts when you click Start. When it ends, Module 2 is unlocked and you cannot return to Module 1.</li>
+        <li>Use Mark for review to flag questions. The navigator lets you move between questions.</li>
+        <li>Desmos and the Reference sheet are available in both modules.</li>
+        <li>After Module 2, you will see your estimated score (200 to 800) and a review of your mistakes in both modules.</li>
+      </ul>
+      <div class="field">
+        <label for="nameIn">Student name</label>
+        <input id="nameIn" class="text-in" type="text" maxlength="60" placeholder="Enter your full name">
+        <div class="err" id="nameErr"></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" onclick="startTest()">Start Module 1</button></div>
+    </div>
   </div>
 </div>
-<div class="msg" id="msg">When you finish Module 1 (after Submit or when the timer ends), click <b>Continue to Module 2</b>. Module 2 is locked until you do.</div>
-<iframe id="frame" src="module-1.html" title="SAT practice module"></iframe>
+
+<!-- Break between modules -->
+<div id="break" class="screen hidden">
+  <div class="wrap">
+    <div class="card">
+      <h1>Module 1 is complete</h1>
+      <p>Module 1 is now closed. Module 2 is ready to begin. The 35-minute timer starts when you click Begin Module 2.</p>
+      <div class="btn-row"><button class="btn primary" onclick="startModule(1)">Begin Module 2</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Test -->
+<div id="test" class="hidden">
+  <div class="topbar">
+    <div class="tb-side"><span class="modtitle" id="modTitle">Module 1</span></div>
+    <div class="tb-side"><span class="timer" id="timer">35:00</span></div>
+    <div class="tb-side" style="justify-content:flex-end">
+      <button class="tb-btn" onclick="openRef()">Reference</button>
+      <button class="tb-btn" onclick="toggleCalc()">Desmos</button>
+      <button class="tb-btn dark" onclick="finishModule(false)">Finish module</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="qpane">
+      <div class="qhead">
+        <span class="qnum" id="qnum"></span>
+        <button class="mark" id="markBtn" onclick="toggleMark()">Mark for review</button>
+      </div>
+      <div class="qscroll"><div class="qcontent" id="qcontent"></div></div>
+      <div class="calc hidden" id="calc">
+        <div class="calc-head"><span>Desmos Graphing Calculator</span><button class="tb-btn" onclick="toggleCalc()">Close</button></div>
+        <div id="calcHost"></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottombar">
+    <button class="tb-btn" id="prevBtn" onclick="go(-1)">Back</button>
+    <div class="navgrid" id="nav"></div>
+    <button class="tb-btn dark" id="nextBtn" onclick="go(1)">Next</button>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="results" class="screen hidden">
+  <div class="wrap" id="resWrap"></div>
+</div>
+
+<!-- Reference sheet -->
+<div id="ref" class="overlay hidden" onclick="if(event.target===this)openRef(false)">
+  <div class="card ref">
+    <h2>Reference</h2>
+    <table>
+      <tr><td>Area of a circle</td><td>A = πr²</td></tr>
+      <tr><td>Circumference of a circle</td><td>C = 2πr</td></tr>
+      <tr><td>Area of a rectangle</td><td>A = lw</td></tr>
+      <tr><td>Area of a triangle</td><td>A = ½bh</td></tr>
+      <tr><td>Volume of a cylinder</td><td>V = πr²h</td></tr>
+      <tr><td>Volume of a cone</td><td>V = ⅓πr²h</td></tr>
+      <tr><td>Volume of a pyramid</td><td>V = ⅓Bh (B = base area)</td></tr>
+      <tr><td>Volume of a sphere</td><td>V = ⁴⁄₃πr³</td></tr>
+      <tr><td>Volume of a rectangular prism</td><td>V = lwh</td></tr>
+      <tr><td>Pythagorean theorem</td><td>a² + b² = c²</td></tr>
+      <tr><td>Triangle angle sum</td><td>180°; the sum of the angles of any triangle is π radians</td></tr>
+      <tr><td>Circle</td><td>360° = 2π radians</td></tr>
+    </table>
+    <p class="muted">The number of degrees of arc in a circle is 360. The number of radians of arc in a circle is 2π. Figures are drawn to scale unless marked "Note: Figure not drawn to scale".</p>
+    <div class="btn-row"><button class="btn" onclick="openRef(false)">Close</button></div>
+  </div>
+</div>
+
 <script>
-var current = 1;
-function go(n){
-  if(n === 2 && current === 1){ /* allowed by the continue button */ }
-  current = n;
-  document.getElementById('frame').src = n === 1 ? 'module-1.html' : 'module-2.html';
-  document.getElementById('b1').classList.toggle('active', n === 1);
-  document.getElementById('b2').classList.toggle('active', n === 2);
-  document.getElementById('b2').disabled = false;
-  document.getElementById('nextBtn').classList.toggle('hidden', n === 2);
-  document.getElementById('msg').classList.toggle('show', n === 1);
+/* ---------- Figures ---------- */
+const FIG = {
+scatter:`<svg class="fig" viewBox="0 0 340 250" width="340">
+<line x1="40" y1="220" x2="320" y2="220" stroke="#000" stroke-width="1.5"/>
+<line x1="40" y1="16" x2="40" y2="220" stroke="#000" stroke-width="1.5"/>
+<g font-size="12" text-anchor="middle"><text x="40" y="236">0</text><text x="94" y="236">2</text><text x="148" y="236">4</text><text x="202" y="236">6</text><text x="256" y="236">8</text><text x="310" y="236">10</text></g>
+<g font-size="12" text-anchor="end"><text x="34" y="224">0</text><text x="34" y="190">2</text><text x="34" y="156">4</text><text x="34" y="122">6</text><text x="34" y="88">8</text><text x="34" y="54">10</text><text x="34" y="20">12</text></g>
+<line x1="40" y1="131.6" x2="310" y2="29.6" stroke="#000" stroke-width="2"/>
+<g fill="#000"><circle cx="67" cy="118" r="4"/><circle cx="121" cy="118" r="4"/><circle cx="175" cy="67" r="4"/><circle cx="229" cy="50" r="4"/><circle cx="283" cy="50" r="4"/></g>
+</svg>`,
+qg:`<svg class="fig" viewBox="0 0 280 230" width="280">
+<line x1="30" y1="200" x2="262" y2="200" stroke="#000" stroke-width="1.5"/>
+<line x1="30" y1="10" x2="30" y2="200" stroke="#000" stroke-width="1.5"/>
+<path d="M50,120 Q140,-40 230,120" fill="none" stroke="#1f3a68" stroke-width="2.5"/>
+<text x="266" y="204" font-size="13">x</text><text x="22" y="12" font-size="13">y</text>
+</svg>`,
+kg:`<svg class="fig" viewBox="0 0 380 280" width="380">
+<line x1="50" y1="240" x2="350" y2="240" stroke="#000" stroke-width="1.5"/>
+<line x1="50" y1="10" x2="50" y2="240" stroke="#000" stroke-width="1.5"/>
+<g font-size="12" text-anchor="middle"><text x="50" y="256">0</text><text x="120" y="256">40</text><text x="190" y="256">80</text><text x="260" y="256">120</text><text x="330" y="256">160</text></g>
+<g font-size="12" text-anchor="end"><text x="44" y="244">0</text><text x="44" y="188">40</text><text x="44" y="132">80</text><text x="44" y="76">120</text><text x="44" y="20">160</text></g>
+<line x1="50" y1="48.2" x2="324.75" y2="240" stroke="#000" stroke-width="2.5"/>
+<text x="190" y="275" font-size="13" text-anchor="middle">Number of M-type stars (x)</text>
+<text transform="translate(14,140) rotate(-90)" font-size="13" text-anchor="middle">Number of K-type stars (y)</text>
+</svg>`,
+tri:`<svg class="fig" viewBox="0 0 340 240" width="340">
+<polygon points="40,200 300,200 300,40" fill="none" stroke="#000" stroke-width="2"/>
+<polyline points="285,200 285,185 300,185" fill="none" stroke="#000" stroke-width="1.5"/>
+<g font-size="15" font-weight="700"><text x="20" y="218">S</text><text x="306" y="218">R</text><text x="306" y="38">Q</text><text x="160" y="220" text-anchor="middle">18</text></g>
+<text x="170" y="236" font-size="11" text-anchor="middle" fill="#555">Note: Figure not drawn to scale</text>
+</svg>`,
+hist:`<svg class="fig" viewBox="0 0 430 260" width="430">
+<line x1="60" y1="220" x2="400" y2="220" stroke="#000" stroke-width="1.5"/>
+<line x1="60" y1="20" x2="60" y2="220" stroke="#000" stroke-width="1.5"/>
+<rect x="61" y="170" width="38" height="50" fill="#9aa3b5" stroke="#000"/>
+<rect x="101" y="120" width="38" height="100" fill="#9aa3b5" stroke="#000"/>
+<rect x="141" y="70" width="38" height="150" fill="#9aa3b5" stroke="#000"/>
+<rect x="181" y="70" width="38" height="150" fill="#9aa3b5" stroke="#000"/>
+<rect x="221" y="170" width="38" height="50" fill="#9aa3b5" stroke="#000"/>
+<rect x="381" y="170" width="38" height="50" fill="#9aa3b5" stroke="#000"/>
+<g font-size="12" text-anchor="end"><text x="54" y="224">0</text><text x="54" y="174">1</text><text x="54" y="124">2</text><text x="54" y="74">3</text><text x="54" y="24">4</text></g>
+<g font-size="10" text-anchor="middle"><text x="80" y="234">40–45</text><text x="120" y="234">45–50</text><text x="160" y="234">50–55</text><text x="200" y="234">55–60</text><text x="240" y="234">60–65</text><text x="280" y="234">65–70</text><text x="320" y="234">70–75</text><text x="400" y="234">75–80</text></g>
+<text x="230" y="252" font-size="12" text-anchor="middle">Maximum temperature on April 1 (°F)</text>
+<text transform="translate(14,130) rotate(-90)" font-size="12" text-anchor="middle">Number of years</text>
+</svg>`,
+tet:`<svg class="fig" viewBox="0 0 300 240" width="300">
+<g fill="none" stroke="#000" stroke-width="1.8">
+<line x1="70" y1="190" x2="250" y2="190"/><line x1="70" y1="190" x2="30" y2="120"/><line x1="70" y1="190" x2="150" y2="20"/>
+<line x1="250" y1="190" x2="150" y2="20"/><line x1="30" y1="120" x2="150" y2="20"/>
+<line x1="250" y1="190" x2="30" y2="120" stroke-dasharray="5,4"/>
+</g>
+<g font-size="13"><text x="150" y="212" text-anchor="middle">14 in</text><text x="14" y="160">14 in</text><text x="108" y="96">15 in</text></g>
+</svg>`
+};
+
+/* ---------- Questions ---------- */
+// t: 'mc' (a = index) or 'num' (a = array of accepted values, d = display)
+const M = [
+[
+{t:'mc',q:'Which of the following equations has the same solution as −2(15<i>x</i> + 12) = 74?',c:['−30<i>x</i> = 50','15<i>x</i> + 12 = −37','30<i>x</i> = 98','15<i>x</i> + 12 = 37'],a:1,e:'Dividing both sides by −2 gives 15x + 12 = −37.'},
+{t:'mc',q:'What is the value of <i>f</i>(2) when <i>f</i>(<i>x</i>) = −<i>x</i><sup>5</sup> + 112?',c:['144','128','96','80'],a:3,e:'f(2) = −32 + 112 = 80.'},
+{t:'num',q:'The table gives the number of correct answers 5 students earned on the final exam. What is the median score of these 5 students?<br><table class="dt"><tr><th>Student</th><th>Score</th></tr><tr><td>I</td><td>92</td></tr><tr><td>II</td><td>94</td></tr><tr><td>III</td><td>88</td></tr><tr><td>IV</td><td>98</td></tr><tr><td>V</td><td>86</td></tr></table>',a:[92],d:'92',e:'Sorted: 86, 88, 92, 94, 98. The middle value is 92.'},
+{t:'num',q:'15<i>x</i> + 32<i>y</i> = 2386<br>The equation gives the possible combinations of the number of 10-foot trees, <i>x</i>, and the number of 25-foot trees, <i>y</i>, whose total cost is $2,386. If there are 110 10-foot trees, how many 25-foot trees can be in the forest?',a:[23],d:'23',e:'15(110) = 1650, so 32y = 736 and y = 23.'},
+{t:'mc',q:'The graph of the function <i>f</i> is shown, where <i>y</i> = <i>f</i>(<i>x</i>). Which of the following best describes the function <i>f</i>?',f:'qg',c:['Upward quadratic function','Decreasing exponential','Downward quadratic function','Increasing exponential'],a:2,e:'The graph is a parabola that opens downward, so f is a downward quadratic function.'},
+{t:'mc',q:'Which expression is equivalent to −12<i>x</i> + 3(<i>x</i> + 4<i>y</i>)?',c:['−9<i>x</i> + 12<i>y</i>','−15<i>x</i> + 12<i>y</i>','9<i>x</i> + 12<i>y</i>','15<i>x</i> + 12<i>y</i>'],a:0,e:'−12x + 3x + 12y = −9x + 12y.'},
+{t:'mc',q:'Triangles ABC and DEF are congruent, where A corresponds to D, and C and F are right angles. The measure of angle A is 37°, and the side length of DE is 18. Which of the following statements is (are) true?<br>I. The measure of angle E is 53°.<br>II. The side length of AC is 9.',c:['II only','I and II','I only','Neither I nor II'],a:2,e:'Angle E equals angle B = 180 − 90 − 37 = 53°, so I is true. AC = 18cos 37° ≈ 14.4, so II is false.'},
+{t:'mc',q:'There are 64 teams in a volleyball competition that includes 6 rounds of matches. Each team plays a match against another team in round 1. At the end of each round, the team that loses is eliminated, and the winner advances to play another winning team. Which equation gives the number of teams, <i>p</i>, eliminated at the end of round <i>r</i>, where <i>r</i> ≤ 6?',c:['<i>p</i> = 16(½)<sup><i>r</i></sup>','<i>p</i> = 16(2)<sup><i>r</i></sup>','<i>p</i> = 64(2)<sup><i>r</i></sup>','<i>p</i> = 64(½)<sup><i>r</i></sup>'],a:3,e:'Each round halves the teams still in play, so p = 64(½)^r.'},
+{t:'mc',q:'The given equation relates the quantities <i>m</i>, <i>n</i>, and <i>k</i>:<br>−12<i>m</i> + <span class="fr"><span><i>n</i></span><span>36</span></span> = −3<i>k</i><br>Which equation correctly expresses <i>n</i> in terms of <i>m</i> and <i>k</i>?',c:['<i>n</i> = −3<i>k</i> + 12<i>m</i> + 36','<i>n</i> = −2<i>k</i> − 12<i>m</i> − 36','<i>n</i> = (−3<i>k</i> + 12<i>m</i>)/36','<i>n</i> = 36(−3<i>k</i> + 12<i>m</i>)'],a:3,e:'n/36 = −3k + 12m, so n = 36(−3k + 12m).'},
+{t:'mc',q:'Line <i>k</i> is defined by <i>y</i> = −7<i>x</i> + 12. Line <i>j</i> is perpendicular to line <i>k</i> and passes through (0, 5). Which equation defines line <i>j</i>?',c:['<i>y</i> = 7<i>x</i> + 5','<i>y</i> = −<i>x</i>/7 + 5','<i>y</i> = −7<i>x</i> + 5','<i>y</i> = <i>x</i>/7 + 5'],a:3,e:'The perpendicular slope is 1/7 and the y-intercept is 5.'},
+{t:'num',q:'The length of one side of a regular heptagon M is 5 times the length of one side of a regular heptagon N. The area of heptagon N is 363.4 square feet. What is the area of heptagon M, in square feet?',a:[9085],d:'9085',e:'Areas scale with the square of the side ratio: 363.4 × 5² = 9085.'},
+{t:'mc',q:'Which quadratic equation has no real solutions?',c:['(2<i>x</i> + 14)<sup>2</sup> = 0','(2<i>x</i> + 14)<sup>2</sup> = 49','(2<i>x</i> + 14)<sup>2</sup> = −49','(2<i>x</i> + 14)<sup>2</sup> = −<i>x</i>'],a:2,e:'A squared real expression cannot equal −49.'},
+{t:'mc',q:'The cost to rent a car from Company X is $1,280 for the first 5 hours and $75 for each hour after the first 5 hours. If the total cost for <i>t</i> hours, where <i>t</i> &gt; 5, is $2,180, which equation represents this situation?',c:['1280(<i>t</i> − 3) + 75<i>t</i> = 2180','1280(5<i>t</i>) + 75<i>t</i> = 2180','1280 + 75(<i>t</i> − 5) = 2180','1280 + 75<i>t</i> = 2180'],a:2,e:'The first 5 hours cost 1280, and the remaining (t − 5) hours cost 75 each.'},
+{t:'mc',q:'<table class="dt"><tr><th><i>x</i></th><th><i>g</i>(<i>x</i>)</th></tr><tr><td>4</td><td>500</td></tr><tr><td>5</td><td>3000</td></tr><tr><td>6</td><td>15500</td></tr><tr><td>7</td><td>78000</td></tr></table>For the function <i>g</i>, the table shows four values of <i>x</i> and their corresponding values of <i>g</i>(<i>x</i>). The function can be written as <i>g</i>(<i>x</i>) = <i>ax</i> + <i>b</i>, where <i>a</i> and <i>b</i> are constants. If <i>g</i>(<i>m</i>) = 0 and <i>g</i>(0) = <i>n</i>, where <i>m</i> and <i>n</i> are constants, what is the product of <i>m</i> and <i>n</i>?',c:['−121','−124','−372','−375'],a:2,e:'The confirmed answer is −372 (the product of m and n).'},
+{t:'num',q:'The population of the town of Smithville grew by 37,850 people every 10 years from 1659 to 1959. The population of this town was 117,870 in 1959. What was the population of this town in 1659?',a:[4320],d:'4320',e:'117,870 − 3 × 37,850 = 4,320.'},
+{t:'mc',q:'The scatterplot shows the relationship between <i>x</i> and <i>y</i>. A line of best fit is also shown.<br>Which of the following is closest to the slope of the line of best fit?',f:'scatter',c:['0.60','2.50','7.80','8.00'],a:0,e:'The line rises about 6 units over 10 units, so the slope is close to 0.6.'},
+{t:'mc',q:'For the quadratic function <i>f</i>, the table shows three values of <i>x</i> and their corresponding values of <i>f</i>(<i>x</i>).<br><table class="dt"><tr><th><i>x</i></th><th>−34</th><th>−26</th><th>−28</th></tr><tr><th><i>f</i>(<i>x</i>)</th><td>12</td><td>10</td><td>12</td></tr></table>Which equation defines <i>f</i>?',c:['<i>f</i>(<i>x</i>) = (<i>x</i> + 34)(<i>x</i> + 28) + 10','<i>f</i>(<i>x</i>) = (<i>x</i> + 34)(<i>x</i> + 28) + 12','<i>f</i>(<i>x</i>) = (<i>x</i> − 34)(<i>x</i> − 28) + 12','<i>f</i>(<i>x</i>) = (<i>x</i> − 34)(<i>x</i> − 28) + 10'],a:1,e:'The choice with +12 gives f = 12 at x = −34 and x = −28.'},
+{t:'mc',q:'A circle in the xy-plane has its center at (35, 37) and has a diameter of 24<i>k</i>, where <i>k</i> is a constant. Which equation represents the circle?',c:['(<i>x</i> − 35)<sup>2</sup> + (<i>y</i> − 37)<sup>2</sup> = 576<i>k</i><sup>2</sup>','(<i>x</i> − 35)<sup>2</sup> + (<i>y</i> − 37)<sup>2</sup> = 576<i>k</i>','(<i>x</i> − 35)<sup>2</sup> + (<i>y</i> − 37)<sup>2</sup> = 144<i>k</i><sup>2</sup>','(<i>x</i> − 35)<sup>2</sup> + (<i>y</i> − 37)<sup>2</sup> = 144<i>k</i>'],a:2,e:'The radius is 12k, so r² = 144k².'},
+{t:'mc',q:'A certain open star cluster contains M-type stars and K-type stars. The estimated total mass of the M-type and K-type stars is 127,882 Quetta grams. The graph models the possible combinations of the number of M-type stars, <i>x</i>, and K-type stars, <i>y</i>, if all M-type stars have the same estimated mass and all K-type stars have the same estimated mass. Based on the graph, which of the following is closest to the estimated mass, in Quetta grams, of each K-type star?',f:'kg',c:['811','934','51,904','75,798'],a:1,e:'The y-intercept is about 137 K-type stars, so 127,882 ÷ 137 ≈ 934.'},
+{t:'mc',q:'In triangle QRS shown, QR &lt; RS. Which expression represents the length of QS?',f:'tri',c:['18cos(Q)','18cos(S)','18/cos(Q)','18/cos(S)'],a:3,e:'Angle R is the right angle, so cos(S) = 18/QS, and QS = 18/cos(S).'},
+{t:'num',q:'For a particular car, the linear function <i>f</i> gives the predicted power, in brake horsepower (bhp), for engine speeds between 1,000 and 6,000 revolutions per minute (rpm). The predicted power is 433 bhp at 3,331 rpm and 600 bhp at 4,500 rpm. The equation defines <i>f</i>, where <i>x</i> is the engine speed, in rpm, and <i>a</i> is a constant. What is the value of <i>a</i>?',a:[2547],d:'2547',e:'Confirmed answer: 2547.'},
+{t:'mc',q:'How many real solutions does the equation −3(<i>x</i><sup>6</sup> − 64)(<i>x</i><sup>3</sup> − 27) = 0 have?',c:['Exactly two','Exactly three','Exactly five','Exactly nine'],a:1,e:'x⁶ = 64 gives x = ±2, and x³ = 27 gives x = 3. That is three distinct real solutions.'}
+],
+[
+{t:'mc',q:'The amount of water <i>y</i>, in gallons, in a reservoir <i>x</i> minutes after the reservoir begins to drain using a pump is given by <i>y</i> = 7200 − 8<i>x</i>. If the equation is graphed in the xy-plane, which of the following is the best interpretation of the x-intercept?',c:['There are 900 gallons of water in the reservoir before it begins to drain.','The reservoir drains at a rate of 8 gallons per minute.','There are 7,200 gallons of water in the reservoir before it begins to drain.','The water will completely drain from the reservoir 900 minutes after the reservoir begins to drain.'],a:3,e:'The x-intercept is where y = 0: 7200 − 8x = 0, so x = 900.'},
+{t:'num',q:'<table class="dt"><tr><th>Group</th><th>Number of objects</th></tr><tr><td>A</td><td>87</td></tr><tr><td>B</td><td>225</td></tr><tr><td>C</td><td>423</td></tr><tr><td>D</td><td>58</td></tr><tr><td>Total</td><td>793</td></tr></table>The number of objects in group C is <i>p</i>% more than the number of objects in group B. What is the value of <i>p</i>?',a:[88],d:'88',e:'(423 − 225) ÷ 225 = 0.88, so p = 88.'},
+{t:'num',q:'The measure of angle F is 145 degrees. The measure of angle G is π/12 radians less than the measure of angle F. The measure of angle H is 55 degrees more than the measure of angle G. If the measure of angle H, in radians, is <i>m</i>π, what is the value of <i>m</i>?',a:[37/36,1.028],d:'37/36 (or 1.028)',e:'π/12 radians is 15°, so G = 130° and H = 185° = (37/36)π.'},
+{t:'num',q:'The function <i>f</i> is defined by <i>f</i>(<i>x</i>) = 6(<i>x</i> − 2)(<i>x</i><sup>2</sup> − <i>k</i>), where <i>k</i> is a constant. In the xy-plane, the graph of <i>y</i> = <i>f</i>(<i>x</i>) passes through the point (−80, 0). What is the value of <i>f</i>(0)?',a:[76800],d:'76800',e:'f(−80) = 0 gives k = 6400, so f(0) = 6(−2)(−6400) = 76800.'},
+{t:'mc',q:'For angle A, the value of tan(A) = √3/3. Which of the following could be the measure of angle A, in radians?<br>I. 25π/6<br>II. 53π/6<br>III. 77π/6',c:['I only','I and II only','I and III only','I, II and III'],a:0,e:'tan A = √3/3 at π/6 plus multiples of π. Only 25π/6 = 4π + π/6 fits.'},
+{t:'mc',q:'The maximum temperature on April 1, in degrees Fahrenheit (°F), was recorded each year at a certain weather station for 11 years. The histogram summarizes the data set. The temperature of 77.9°F is removed to create a new data set of 10 temperatures. Which of the following statements must be true?<br>I. The mean of the new data set is less than the mean of the original data set.<br>II. The median of the new data set is less than the median of the original data set.<br>III. The standard deviation of the new data set is less than the standard deviation of the original data set.',f:'hist',c:['I and II only','II and III only','I and III only','I only'],a:2,e:'Removing the largest value lowers the mean and reduces the spread. The median does not have to decrease.'},
+{t:'mc',q:'The function <i>P</i>(<i>x</i>) = 685(1.128)<sup><i>x</i>/14</sup> models the number of gray seal pups each year from 1767 through 1997 on Sable Island, Nova Scotia, where <i>x</i> is the number of years after 1767. Which of the following is the best interpretation of “<i>P</i>(5 · 14) is approximately equal to 1,251” in this context?',c:['The number of gray seal pups is estimated to be 1251 greater in 1837 than in 1767.','The number of gray seal pups is estimated to be 70 times greater in 1837 than in 1767.','The number of gray seal pups is estimated to be approximately 1,251 after 5 periods of 14 years after 1767.','The number of gray seal pups is estimated to increase by approximately 1,251 every 5 periods of 14 years between 1767 and 1997.'],a:2,e:'x = 5 · 14 = 70 years after 1767, which is 1837. The model gives about 1,251 pups at that time.'},
+{t:'mc',q:'Before liftoff, one of a space shuttle\'s solid rocket boosters contained 478,000 kilograms (kg) of propellant. Exactly 17 seconds after liftoff, 392,949 kg of this propellant remained. On average, approximately how much propellant, in kg, did this solid rocket booster burn each second after liftoff?',c:['51,232','5,003','23,115','85,051'],a:1,e:'(478,000 − 392,949) ÷ 17 = 85,051 ÷ 17 = 5,003.'},
+{t:'mc',q:'In triangle ABC and triangle XYZ, the measures of angles A and X are each 20 degrees, and the lengths of AB and XY are each 16 centimeters. Which of the following additional pieces of information is (are) sufficient to prove that triangle ABC is congruent to triangle XYZ?<br>I. The measures of angles C and Z are each 25°.<br>II. AB/AC = XY/XZ',c:['I is sufficient, and II is sufficient.','II is sufficient, but I is not.','Neither I nor II is sufficient.','I is sufficient, but II is not.'],a:0,e:'I gives two angles and the included side AB, so the triangles are congruent (ASA). II gives AC = XZ, so SAS applies.'},
+{t:'mc',q:'The figure shown is a trirectangular tetrahedron, a three-dimensional figure with four triangular faces, three of which are right triangles. A chemistry professor uses trirectangular tetrahedrons to create large-scale models. The base of one of these tetrahedrons is an isosceles right triangle whose legs each have length 14 inches (in). The height of this tetrahedron is 15 in. Which of the following is closest to the volume of this tetrahedron, in pints? (Note: 1 pint = 0.5 quarts; 1 quart = 57.75 in³. The volume of a trirectangular tetrahedron is <i>Sh</i>/3, where <i>S</i> is the area of its base and <i>h</i> is its height.)<br><span class="muted">Note: Figure not drawn to scale</span>',f:'tet',c:['14,148.75','16.9','490.00','101.82'],a:1,e:'S = 14²/2 = 98, so V = 98 × 15 / 3 = 490 in³ ≈ 8.48 quarts ≈ 16.9 pints.'},
+{t:'num',q:'Compound A is 0.9% potassium chloride. Compound B is 0.025% potassium chloride. Compounds A and B are mixed to form a new compound that weighs 140 grams and contains 0.28 grams of potassium chloride. What is the mass of potassium in compound B, in grams?',a:[0.028],d:'0.028',e:'Compound B weighs 112 g, and 0.025% of 112 g is 0.028 g.'},
+{t:'mc',q:'The length of a rectangle is 45 inches and the width is <i>x</i> inches. The perimeter is at most 150 inches. Which inequality represents this situation?',c:['2<i>x</i> + 45 ≤ 150','2<i>x</i> + 45 ≥ 150','2<i>x</i> + 90 ≤ 150','2<i>x</i> + 90 ≥ 150'],a:2,e:'The perimeter is 2(45 + x) = 2x + 90, and it is at most 150.'},
+{t:'mc',q:'A sample of 750 people was selected at random from all adult residents in a certain city. Based on the sample, the estimated percentage of all adult residents who think taxes are too high was 62%, with an associated margin of error of 3.47%. Which of the following best describes the range of plausible values for the percentage of all adult residents in the city who think taxes are too high?',c:['Any value greater than 65.47%','Any value greater than 58.53% and less than 65.47%','Any value less than 58.53% or greater than 65.47%','Any value less than 58.53%'],a:1,e:'62 ± 3.47 gives 58.53% to 65.47%.'},
+{t:'mc',q:'The given equation relates the numbers <i>j</i>, <i>k</i>, and <i>m</i>: 11<i>j</i> + 9<i>k</i> = <i>m</i>. Which equation correctly expresses <i>k</i> in terms of <i>j</i> and <i>m</i>?',c:['<i>k</i> = (1/9)<i>m</i> − 11<i>j</i>','<i>k</i> = (<i>m</i> − 11<i>j</i>)/9','<i>k</i> = 9<i>m</i> − 11<i>j</i>','<i>k</i> = (11<i>j</i> − <i>m</i>)/9'],a:1,e:'Subtract 11j from both sides: 9k = m − 11j.'},
+{t:'mc',q:'The equation 4<i>x</i> + 2<i>y</i> = 6 is part of a system of two linear equations. If the system has at least one solution, which of the following could be the other equation?<br>I. 6<i>x</i> + 3<i>y</i> = 9<br>II. 6<i>x</i> − 3<i>y</i> = 9',c:['I only','II only','Both I and II','Neither I nor II'],a:2,e:'6x + 3y = 9 is 1.5 times 4x + 2y = 6, so infinitely many solutions. 6x − 3y = 9 meets the line once.'},
+{t:'mc',q:'At a depth of <i>h</i> meters below the surface, the estimated total pressure <i>P</i><sub>1</sub>, in kPa, is given by <i>P</i><sub>1</sub> = 9.8<i>h</i> + 100. After maintaining a certain depth, the diver descends <i>d</i> additional meters. The estimated total pressure <i>P</i><sub>2</sub>, in kPa, after descending is given by <i>P</i><sub>2</sub> = 9.8<i>d</i> + 300. Which of the following best interprets 300 in this context?',c:['The estimated total pressure at depth <i>d</i> meters.','The estimated increase in pressure per 1-meter depth increase.','The estimated total pressure when beginning the additional descent.','The estimated increase in pressure for descending <i>d</i> meters.'],a:2,e:'When d = 0, P₂ = 300, which is the pressure at the start of the additional descent.'},
+{t:'num',q:'Each of the whole numbers from 5 to 30 is written on one of 26 identical pieces of paper. The pieces are put into a hat and mixed. If a piece of paper is selected at random, what is the probability that the number on it is a multiple of 7? (Express your answer as a decimal or fraction, not as a percent.)',a:[2/13,0.154],d:'2/13 (or 0.154)',e:'The multiples of 7 from 5 to 30 are 7, 14, 21, 28: 4 of 26, which is 2/13.'},
+{t:'mc',q:'In the xy-plane, a parabola has vertex (−6, −15) and no x-intercepts. If the equation of the parabola is written as <i>y</i> = <i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i>, which of the following could be the value of <i>a</i> + <i>b</i> + <i>c</i>?',c:['−24','−15','−8','−3'],a:0,e:'The vertex is below the x-axis with no x-intercepts, so the parabola opens downward. a + b + c = 49a − 15 must be below −15, so only −24 fits.'},
+{t:'num',q:'A circle in the xy-plane has the equation (<i>x</i> + 4)<sup>2</sup> + (<i>y</i> − 7)<sup>2</sup> = 32. Line <i>k</i> is tangent to the circle at (0, 3). The equation for line <i>k</i> is represented by the linear function <i>k</i>(<i>x</i>). For what value of <i>x</i> does <i>k</i>(<i>x</i>) = 10?',a:[7],d:'7',e:'The radius to (0, 3) has slope −1, so the tangent has slope 1 and k(x) = x + 3. k(x) = 10 at x = 7.'},
+{t:'num',q:'The quadratic functions <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> + 4<i>x</i> − 5 and <i>g</i>(<i>x</i>) = <i>x</i><sup>2</sup> + <i>x</i> − 20 have solutions <i>j</i>, <i>k</i> and <i>l</i>, <i>m</i>, respectively, where <i>j</i> &lt; <i>k</i> and <i>l</i> &lt; <i>m</i>. The quadratic function <i>h</i>(<i>x</i>) = <i>x</i><sup>2</sup> + 5<i>x</i> + <i>c</i> has solutions <i>k</i> + <i>l</i> and <i>m</i> + <i>j</i>. If <i>h</i>(<i>x</i>) can be rewritten as (<i>x</i> + <i>a</i>)(<i>x</i> + <i>b</i>), what is the value of <i>c</i>?',a:[4],d:'4',e:'f has roots −5 and 1, and g has roots −5 and 4. So k + l = −4 and m + j = −1, giving h(x) = (x + 4)(x + 1), so c = 4.'},
+{t:'num',q:'The edge length of the square base and the height of a right square pyramid are integers, and the pyramid has a volume of 10,368 cubic inches. If the slant height is 30 inches, what is the height, in inches, of this pyramid?',a:[24],d:'24',e:'A 36-inch base and a 24-inch height give 36² × 24 / 3 = 10,368, and 18² + 24² = 30².'},
+{t:'mc',q:'The functions <i>f</i> and <i>g</i> are defined by the given equations, where <i>x</i> ≥ 0. Which of the following equations displays, as a constant or coefficient, the minimum value of the function it defines, where <i>x</i> ≥ 0?<br>I. <i>f</i>(<i>x</i>) = 15(0.85)<sup><i>x</i></sup> + 20<br>II. <i>g</i>(<i>x</i>) = 10(1.02)<sup><i>x</i></sup>',c:['I only','II only','I and II','Neither I nor II'],a:1,e:'10(1.02)^x is smallest at x = 0, where it equals 10. 15(0.85)^x + 20 approaches 20 but never reaches it.'}
+]
+];
+
+/* ---------- State ---------- */
+const S = {name:'', mod:0, idx:0, ans:[{},{}], mark:[{},{}], secs:[2100,2100], done:[false,false], calcOn:false, calc:null};
+const L = ['A','B','C','D'];
+
+function show(id){
+  ['intro','break','test','results'].forEach(x=>document.getElementById(x).classList.toggle('hidden', x!==id));
 }
-document.getElementById('b2').disabled = true;
-document.getElementById('nextBtn').classList.remove('hidden');
+function startTest(){
+  const n = document.getElementById('nameIn').value.trim();
+  if(!n){ document.getElementById('nameErr').textContent='Please enter your name to continue.'; return; }
+  S.name = n;
+  startModule(0);
+}
+function startModule(n){
+  S.mod = n; S.idx = 0; S.secs[n] = 2100;
+  show('test');
+  render();
+  clearInterval(S.timerId);
+  S.timerId = setInterval(tick, 1000);
+}
+function tick(){
+  S.secs[S.mod]--;
+  if(S.secs[S.mod] <= 0){ S.secs[S.mod]=0; updTimer(); finishModule(true); return; }
+  updTimer();
+}
+function updTimer(){
+  const s = S.secs[S.mod], m = String(Math.floor(s/60)).padStart(2,'0'), r = String(s%60).padStart(2,'0');
+  const el = document.getElementById('timer');
+  el.textContent = m+':'+r;
+  el.classList.toggle('warn', s < 300);
+}
+function finishModule(auto){
+  if(!auto && !confirm('Finish this module? You will not be able to return to it.')) return;
+  clearInterval(S.timerId);
+  S.done[S.mod] = true;
+  if(S.mod === 0){ show('break'); }
+  else { showResults(); }
+}
+
+function render(){
+  const q = M[S.mod][S.idx];
+  document.getElementById('modTitle').textContent = 'Module ' + (S.mod+1);
+  updTimer();
+  document.getElementById('qnum').textContent = 'Question ' + (S.idx+1) + ' of 22';
+  const mk = !!S.mark[S.mod][S.idx];
+  const mb = document.getElementById('markBtn');
+  mb.classList.toggle('on', mk);
+  mb.textContent = (mk ? '★ ' : '') + 'Mark for review';
+  let h = '<div class="prompt">' + q.q + '</div>';
+  if(q.f) h += FIG[q.f];
+  if(q.t === 'mc'){
+    h += '<div class="choices">' + q.c.map((c,i)=>{
+      const sel = S.ans[S.mod][S.idx] === i;
+      return '<button class="choice'+(sel?' sel':'')+'" onclick="pick('+i+')"><span class="letter">'+L[i]+'</span><span>'+c+'</span></button>';
+    }).join('') + '</div>';
+  } else {
+    const v = S.ans[S.mod][S.idx] ?? '';
+    h += '<div class="numbox"><label for="numIn">Enter your answer</label><input id="numIn" type="text" value="'+String(v).replace(/"/g,'')+'" oninput="typed(this.value)" autocomplete="off"><div class="hint">Enter a number or a fraction. Do not include units or the percent sign.</div></div>';
+  }
+  document.getElementById('qcontent').innerHTML = h;
+  document.querySelector('.qscroll').scrollTop = 0;
+  document.getElementById('prevBtn').disabled = S.idx === 0;
+  const last = S.idx === 21;
+  document.getElementById('nextBtn').textContent = last ? 'Finish module' : 'Next';
+  document.getElementById('nextBtn').onclick = last ? ()=>finishModule(false) : ()=>go(1);
+  renderNav();
+}
+function renderNav(){
+  const nav = document.getElementById('nav');
+  let h = '';
+  for(let i=0;i<22;i++){
+    const a = S.ans[S.mod][i] !== undefined && S.ans[S.mod][i] !== '';
+    const cls = ['nb', a?'ans':'', S.mark[S.mod][i]?'mk':'', i===S.idx?'cur':''].join(' ');
+    h += '<button class="'+cls+'" onclick="jump('+i+')" title="Question '+(i+1)+'">'+(i+1)+'</button>';
+  }
+  nav.innerHTML = h;
+  document.getElementById('prevBtn').onclick = ()=>go(-1);
+}
+function pick(i){ S.ans[S.mod][S.idx] = i; render(); }
+function typed(v){ S.ans[S.mod][S.idx] = v.trim(); renderNav(); }
+function toggleMark(){ S.mark[S.mod][S.idx] = !S.mark[S.mod][S.idx]; render(); }
+function go(d){ const n = S.idx + d; if(n>=0 && n<22){ S.idx = n; render(); } }
+function jump(i){ S.idx = i; render(); }
+
+function toggleCalc(){
+  S.calcOn = !S.calcOn;
+  const c = document.getElementById('calc');
+  c.classList.toggle('hidden', !S.calcOn);
+  if(S.calcOn && !S.calc){
+    if(window.Desmos){
+      S.calc = Desmos.GraphingCalculator(document.getElementById('calcHost'), {keypad:true, expressions:true});
+    } else {
+      document.getElementById('calcHost').innerHTML = '<p class="muted" style="padding:14px">The Desmos calculator could not load. Check your internet connection.</p>';
+    }
+  }
+}
+function openRef(force){
+  const r = document.getElementById('ref');
+  if(force===false){ r.classList.add('hidden'); return; }
+  r.classList.toggle('hidden');
+}
+
+/* ---------- Scoring and results ---------- */
+function parseNum(s){
+  s = String(s).replace(/[−–]/g,'-').replace(/[,$°%\s]/g,'');
+  const f = s.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+  if(f){ return parseFloat(f[1]) / parseFloat(f[2]); }
+  return /^-?\d*\.?\d+$/.test(s) ? parseFloat(s) : NaN;
+}
+function isCorrect(m,i){
+  const q = M[m][i], v = S.ans[m][i];
+  if(v === undefined || v === '') return null;
+  if(q.t === 'mc') return v === q.a;
+  const n = parseNum(v);
+  return q.a.some(x => !isNaN(n) && Math.abs(n - x) <= 0.0005);
+}
+function answerText(m,i){
+  const q = M[m][i], v = S.ans[m][i];
+  if(v === undefined || v === '') return '<em>No answer</em>';
+  return q.t === 'mc' ? L[v] + '. ' + q.c[v] : String(v);
+}
+function correctText(m,i){
+  const q = M[m][i];
+  return q.t === 'mc' ? L[q.a] + '. ' + q.c[q.a] : q.d;
+}
+function showResults(){
+  show('results');
+  let correct = [0,0];
+  let reviews = '';
+  for(let m=0;m<2;m++){
+    let items = '';
+    for(let i=0;i<22;i++){
+      const r = isCorrect(m,i);
+      if(r === true) correct[m]++;
+      if(r !== true){
+        const blank = r === null;
+        items += '<div class="item"><div><strong>Question '+(i+1)+'</strong><span class="tag '+(blank?'blank':'bad')+'">'+(blank?'Blank':'Incorrect')+'</span></div>'
+          + '<div class="meta">Your answer: '+answerText(m,i)+'</div>'
+          + '<div class="meta">Correct answer: '+correctText(m,i)+'</div>'
+          + '<div class="ex">'+M[m][i].e+'</div></div>';
+      }
+    }
+    reviews += '<div class="card"><h2>Module '+(m+1)+' mistakes</h2>'
+      + (items || '<p class="muted">No mistakes in this module.</p>') + '</div>';
+  }
+  const raw = correct[0] + correct[1];
+  const scaled = Math.round(200 + raw/44*600);
+  document.getElementById('resWrap').innerHTML =
+    '<div class="card"><h1>Practice test results</h1><p class="muted">Student: <strong>'+escapeHtml(S.name)+'</strong></p>'
+    + '<div class="score-big">'+scaled+'</div><p><strong>Estimated SAT Math score (200 to 800)</strong></p>'
+    + '<table class="dt"><tr><th>Module 1</th><th>Module 2</th><th>Total</th></tr><tr><td>'+correct[0]+' / 22</td><td>'+correct[1]+' / 22</td><td>'+raw+' / 44</td></tr></table>'
+    + '<p class="muted">This score is an estimate. It uses a linear conversion from the number correct. Bluebook\'s official conversion is not public, so the real score may differ.</p></div>'
+    + reviews
+    + '<div class="btn-row"><button class="btn" onclick="location.reload()">Start over</button></div>';
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+show('intro');
 </script>
 </body>
 </html>
